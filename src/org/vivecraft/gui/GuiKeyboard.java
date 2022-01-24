@@ -1,5 +1,6 @@
 package org.vivecraft.gui;
 
+import net.minecraft.client.Minecraft;
 import org.lwjgl.glfw.GLFW;
 import org.vivecraft.gui.framework.TwoHandedScreen;
 import org.vivecraft.provider.InputSimulator;
@@ -8,10 +9,15 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 
 import net.minecraft.client.gui.widget.button.Button;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class GuiKeyboard extends TwoHandedScreen
 {
 
 	private boolean isShift = false;
+
+	private static final Timer timer = new Timer();
 
 	/**
 	 * Adds the buttons (and other controls) to the screen in question.
@@ -56,7 +62,8 @@ public class GuiKeyboard extends TwoHandedScreen
 				this.addButton(butt);
 			}
 		}		
-	
+
+		Minecraft instance = Minecraft.getInstance();
 		this.addButton(new Button( 0, margin + 3* (20 + spacing), 30, 20, "Shift",(p) ->  {
 				setShift(!GuiKeyboard.this.isShift);
 		}));
@@ -67,53 +74,59 @@ public class GuiKeyboard extends TwoHandedScreen
 		
 		this.addButton(new Button(cols * (bwidth+spacing) + margin, margin , 35 , 20, "BKSP",(p) ->  {
 				InputSimulator.pressKey(GLFW.GLFW_KEY_BACKSPACE);
-				InputSimulator.releaseKey(GLFW.GLFW_KEY_BACKSPACE);
+				timer.schedule(createTask(instance, () -> InputSimulator.releaseKey(GLFW.GLFW_KEY_BACKSPACE)), 50);
 		}));
 		this.addButton(new Button(cols * (bwidth+spacing) + margin, margin + 2*(20 + spacing) , 35 , 20, "ENTER",(p) ->  {
 				InputSimulator.pressKey(GLFW.GLFW_KEY_ENTER);
-				InputSimulator.releaseKey(GLFW.GLFW_KEY_ENTER);
+				timer.schedule(createTask(instance, () -> InputSimulator.releaseKey(GLFW.GLFW_KEY_ENTER)), 50);
 		}));
 		this.addButton(new Button(0, margin + (20 + spacing), 30, 20, "TAB",(p) ->  {
 				InputSimulator.pressKey(GLFW.GLFW_KEY_TAB);
-				InputSimulator.releaseKey(GLFW.GLFW_KEY_TAB);
+				timer.schedule(createTask(instance, () -> InputSimulator.releaseKey(GLFW.GLFW_KEY_TAB)), 50);
 		}));
 		this.addButton(new Button(0, margin, 30, 20, "ESC",(p) ->  {
 				InputSimulator.pressKey(GLFW.GLFW_KEY_ESCAPE);
-				InputSimulator.releaseKey(GLFW.GLFW_KEY_ESCAPE);
+				timer.schedule(createTask(instance, () -> InputSimulator.releaseKey(GLFW.GLFW_KEY_ESCAPE)), 50);
 		}));
 		this.addButton(new Button((cols - 1) * (bwidth + spacing) + margin, margin + rows * (20 + spacing), bwidth, 20, "\u2191",(p) ->  {
 				InputSimulator.pressKey(GLFW.GLFW_KEY_UP);
-				InputSimulator.releaseKey(GLFW.GLFW_KEY_UP);
+				timer.schedule(createTask(instance, () -> InputSimulator.releaseKey(GLFW.GLFW_KEY_UP)), 50);
 		}));
 		this.addButton(new Button((cols - 1) * (bwidth + spacing) + margin, margin + (rows + 1) * (20 + spacing), bwidth, 20, "\u2193",(p) ->  {
 				InputSimulator.pressKey(GLFW.GLFW_KEY_DOWN);
-				InputSimulator.releaseKey(GLFW.GLFW_KEY_DOWN);
+				timer.schedule(createTask(instance, () -> InputSimulator.releaseKey(GLFW.GLFW_KEY_DOWN)), 50);
 		}));
 		this.addButton(new Button((cols - 2) * (bwidth + spacing) + margin, margin + (rows + 1) * (20 + spacing), bwidth, 20, "\u2190",(p) ->  {
 				InputSimulator.pressKey(GLFW.GLFW_KEY_LEFT);
-				InputSimulator.releaseKey(GLFW.GLFW_KEY_LEFT);
+				timer.schedule(createTask(instance, () -> InputSimulator.releaseKey(GLFW.GLFW_KEY_LEFT)), 50);
 		}));
 		this.addButton(new Button(cols * (bwidth + spacing) + margin, margin + (rows + 1) * (20 + spacing), bwidth, 20, "\u2192",(p) ->  {
 				InputSimulator.pressKey(GLFW.GLFW_KEY_RIGHT);
-				InputSimulator.releaseKey(GLFW.GLFW_KEY_RIGHT);
+				timer.schedule(createTask(instance, () -> InputSimulator.releaseKey(GLFW.GLFW_KEY_RIGHT)), 50);
 		}));
 		this.addButton(new Button(margin, margin + -1 * (20 + spacing), 35, 20, "CUT",(p) ->  {
 				InputSimulator.pressKey(GLFW.GLFW_KEY_LEFT_CONTROL);
 				InputSimulator.pressKey(GLFW.GLFW_KEY_X);
-				InputSimulator.releaseKey(GLFW.GLFW_KEY_X);
-				InputSimulator.releaseKey(GLFW.GLFW_KEY_LEFT_CONTROL);
+				timer.schedule(createTask(instance, () -> {
+					InputSimulator.releaseKey(GLFW.GLFW_KEY_X);
+					InputSimulator.releaseKey(GLFW.GLFW_KEY_LEFT_CONTROL);
+				}), 50);
 		}));
 		this.addButton(new Button(35 + spacing + margin, margin + -1 * (20 + spacing), 35, 20, "COPY",(p) ->  {
 				InputSimulator.pressKey(GLFW.GLFW_KEY_LEFT_CONTROL);
 				InputSimulator.pressKey(GLFW.GLFW_KEY_C);
-				InputSimulator.releaseKey(GLFW.GLFW_KEY_C);
-				InputSimulator.releaseKey(GLFW.GLFW_KEY_LEFT_CONTROL);
+				timer.schedule(createTask(instance, () -> {
+					InputSimulator.releaseKey(GLFW.GLFW_KEY_C);
+					InputSimulator.releaseKey(GLFW.GLFW_KEY_LEFT_CONTROL);
+				}), 50);
 		}));
 		this.addButton(new Button(2 * (35 + spacing) + margin, margin + -1 * (20 + spacing), 35, 20, "PASTE",(p) ->  {
 				InputSimulator.pressKey(GLFW.GLFW_KEY_LEFT_CONTROL);
 				InputSimulator.pressKey(GLFW.GLFW_KEY_V);
-				InputSimulator.releaseKey(GLFW.GLFW_KEY_V);
-				InputSimulator.releaseKey(GLFW.GLFW_KEY_LEFT_CONTROL);
+				timer.schedule(createTask(instance, () -> {
+					InputSimulator.releaseKey(GLFW.GLFW_KEY_V);
+					InputSimulator.releaseKey(GLFW.GLFW_KEY_LEFT_CONTROL);
+				}), 50);
 		}));
 	}
 
@@ -133,6 +146,15 @@ public class GuiKeyboard extends TwoHandedScreen
     	this.drawCenteredString(matrixstack, this.font, "Keyboard", this.width / 2, 2, 16777215);
     	super.render(matrixstack, 0, 0, partialTicks);
 
-    }    
+    }
+
+	private TimerTask createTask(Minecraft instance, Runnable task) {
+		return new TimerTask() {
+			@Override
+			public void run() {
+				instance.execute(task);
+			}
+		};
+	}
 
 }
